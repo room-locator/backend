@@ -19,9 +19,17 @@ public class IcalServiceAdapter : IIcalService
 
         foreach (var range in calendar.Events)
         {
-            // convert CalendarEvents to TimeRange
+            var dtStart = range.DtStart;
+            var dtEnd = range.DtEnd;
+
+            ranges.Add(new TimeRange
+            {
+                Type = TimeRangeTypes.Busy,
+                To = new DateTime(dtEnd.Year, dtEnd.Month, dtEnd.Day, dtEnd.Hour, dtEnd.Minute, dtEnd.Second),
+                From = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, dtStart.Hour, dtStart.Minute, dtStart.Second),
+            });
         }
-        
+
         return ranges;
     }
 }

@@ -9,12 +9,17 @@ public class ScheduleService
 
         foreach (var timeRange in schedule.TimeRanges)
         {
-            nearestFutureTimeRange ??= timeRange;
-
             if (timeRange.From <= desiredTime && desiredTime <= timeRange.To)
             {
                 return (false, null);
             }
+
+            if (desiredTime >= timeRange.From)
+            {
+                continue;
+            }
+
+            nearestFutureTimeRange ??= timeRange;
 
             if (timeRange.From - desiredTime < nearestFutureTimeRange.From - desiredTime)
             {
