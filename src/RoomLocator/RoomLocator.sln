@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomLocator.Api", "RoomLocator.Api\RoomLocator.Api.csproj", "{58DB4277-9F54-4241-ABD8-B06ACCCEC644}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomLocator.Business", "RoomLocator.Business\RoomLocator.Business.csproj", "{785FFFCA-CAC6-4561-9156-3D36F53E7FC0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoomLocator.Persistence", "RoomLocator.Persistence\RoomLocator.Persistence.csproj", "{83BB339E-DDB2-4A2F-A44D-832DE9C57DEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{58DB4277-9F54-4241-ABD8-B06ACCCEC644}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58DB4277-9F54-4241-ABD8-B06ACCCEC644}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58DB4277-9F54-4241-ABD8-B06ACCCEC644}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58DB4277-9F54-4241-ABD8-B06ACCCEC644}.Release|Any CPU.Build.0 = Release|Any CPU
+		{785FFFCA-CAC6-4561-9156-3D36F53E7FC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{785FFFCA-CAC6-4561-9156-3D36F53E7FC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{785FFFCA-CAC6-4561-9156-3D36F53E7FC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{785FFFCA-CAC6-4561-9156-3D36F53E7FC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{83BB339E-DDB2-4A2F-A44D-832DE9C57DEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83BB339E-DDB2-4A2F-A44D-832DE9C57DEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83BB339E-DDB2-4A2F-A44D-832DE9C57DEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83BB339E-DDB2-4A2F-A44D-832DE9C57DEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
