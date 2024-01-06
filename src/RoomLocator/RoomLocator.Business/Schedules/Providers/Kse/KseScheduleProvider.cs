@@ -30,7 +30,7 @@ public class KseScheduleProvider : IScheduleProvider
         {
             var room = new Room
             {
-                Name = rooms[i].Name,
+                Name = rooms[i].Label,
                 ExternalId = rooms[i].Id,
             };
 

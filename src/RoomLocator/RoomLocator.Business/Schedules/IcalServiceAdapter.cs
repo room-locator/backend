@@ -17,6 +17,11 @@ public class IcalServiceAdapter : IIcalService
 
         var ranges = new List<TimeRange>();
 
+        if (calendar is null)
+        {
+            return ranges;
+        }
+
         foreach (var range in calendar.Events)
         {
             var dtStart = range.DtStart;

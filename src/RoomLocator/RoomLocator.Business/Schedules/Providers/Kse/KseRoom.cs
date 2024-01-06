@@ -6,5 +6,5 @@ public class KseRoom
     // When the schedule.kse.ua API starts working
     public int Id { get; set; }
     
-    public string Name { get; set; }
+    public string Label { get; set; }
 }
