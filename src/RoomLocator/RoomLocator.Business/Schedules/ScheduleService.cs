@@ -37,6 +37,11 @@ public class ScheduleService
 
             var nearestFutureRange = CalculateNearestFutureRange(desiredTime, schedule);
 
+            if (OutOfRange(desiredTime, nearestFutureRange))
+            {
+                continue;
+            }
+
             richRooms.Add(new RichRoom
                 {
                     Name = entry.Key.Name,
@@ -55,9 +60,22 @@ public class ScheduleService
         {
             if (timeRange.From <= desiredTime && desiredTime <= timeRange.To)
             {
-                continue;
+                return false;
             }
+        }
 
+        return true;
+    }
+
+    private bool OutOfRange(DateTime desiredTime, TimeRange? nearestTimeRange)
+    {
+        if (nearestTimeRange is null)
+        {
+            return false;
+        }
+        
+        if (nearestTimeRange.From.Date != desiredTime.Date)
+        {
             return true;
         }
 
