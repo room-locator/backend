@@ -14,8 +14,15 @@ public class ScheduleService
         _kseScheduleProvider = kseScheduleProvider;
     }
 
-    public async Task<List<RichRoom>> FindAvailableRoomsAsync(DateTime desiredTime)
+    public async Task<List<RichRoom>> FindAvailableRoomsAsync(DateTime? desiredTime = null)
     {
+        if (desiredTime.HasValue && desiredTime.Value < DateTime.Now)
+        {
+            throw new Exception("desiredTime can not be less or equal to current date");
+        }
+
+        desiredTime ??= DateTime.Now;
+        
         var dictionary = await _kseScheduleProvider.GetIcalContentsByRooms();
 
         var richRooms = new List<RichRoom>();
@@ -30,14 +37,14 @@ public class ScheduleService
                 TimeRanges = timeRanges,
             };
 
-            if (!Available(desiredTime, schedule))
+            if (!Available(desiredTime.Value, schedule))
             {
                 continue;
             }
 
-            var nearestFutureRange = CalculateNearestFutureRange(desiredTime, schedule);
+            var nearestFutureRange = CalculateNearestFutureRange(desiredTime.Value, schedule);
 
-            if (OutOfRange(desiredTime, nearestFutureRange))
+            if (OutOfRange(desiredTime.Value, nearestFutureRange))
             {
                 continue;
             }

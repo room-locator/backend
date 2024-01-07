@@ -17,8 +17,8 @@ public sealed class ScheduleController
 
     [HttpGet]
     [Route("available-rooms")]
-    public async Task<List<RichRoom>> FindAvailableRooms([FromQuery] FindAvailableRooms request)
+    public async Task<List<RichRoom>> FindAvailableRooms([FromQuery] DateTime? desiredTime = null)
     {
-        return await _scheduleService.FindAvailableRoomsAsync(request.DesiredTime);
+        return await _scheduleService.FindAvailableRoomsAsync(desiredTime);
     }
 }
