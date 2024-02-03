@@ -4,14 +4,6 @@ namespace RoomLocator.Business.Schedules.Providers.Kse;
 
 public class KseScheduleProvider : IScheduleProvider
 {
-    private readonly HashSet<string> _deadRooms = new HashSet<string>
-    {
-        "1.08.2 Genesis Classroom",
-        "2.08.1 TA Ventures Classroom",
-        "2.08.2 TA Ventures Classroom",
-        "4.08 TAS Group Classroom",
-    };
-    
     private readonly IKseScheduleClient _kseScheduleClient;
 
     public KseScheduleProvider(IKseScheduleClient kseScheduleClient)
@@ -19,7 +11,7 @@ public class KseScheduleProvider : IScheduleProvider
         _kseScheduleClient = kseScheduleClient;
     }
 
-    public async Task<Dictionary<Room, string>> GetIcalContentsByRooms()
+    public async Task<Dictionary<string, string>> GetIcalContentsByRooms()
     {
         var rooms = await _kseScheduleClient.GetRoomsAsync();
 
@@ -32,22 +24,11 @@ public class KseScheduleProvider : IScheduleProvider
 
         await Task.WhenAll(tasks);
 
-        var dictionary = new Dictionary<Room, string>();
+        var dictionary = new Dictionary<string, string>();
 
         for (int i = 0; i < rooms.Count; i++)
         {
-            if (_deadRooms.Contains(rooms[i].Label))
-            {
-                continue;
-            }
-            
-            var room = new Room
-            {
-                Name = rooms[i].Label,
-                ExternalId = rooms[i].Id,
-            };
-
-            dictionary.Add(room, tasks[i].Result);
+            dictionary.Add(rooms[i].Label, tasks[i].Result);
         }
 
         return dictionary;
