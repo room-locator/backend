@@ -1,0 +1,13 @@
+version: "3"
+services:
+  api:
+    image: mokuteki225/room-locator-api:latest
+    ports:
+      - "5164:5164"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORT=https://+:7137
+      - ASPNETCORE_URLS=http://+:5164
+    container_name: room_locator_api
+volumes:
+  pgdata:
