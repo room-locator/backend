@@ -4,5 +4,5 @@ public interface IKseScheduleClient
 {
     Task<List<KseRoom>> GetRoomsAsync();
 
-    Task<string> GetRoomIcalContentAsync(int id);
+    Task<string> GetIcalContentByRoomAsync(int id);
 }

@@ -1,8 +1,6 @@
-using RoomLocator.Business.Schedules.Interfaces;
-
 namespace RoomLocator.Business.Schedules.Providers.Kse;
 
-public class KseScheduleProvider : IScheduleProvider
+public class KseScheduleProvider
 {
     private readonly IKseScheduleClient _kseScheduleClient;
 
@@ -19,7 +17,7 @@ public class KseScheduleProvider : IScheduleProvider
 
         foreach (var room in rooms)
         {
-            tasks.Add(_kseScheduleClient.GetRoomIcalContentAsync(room.Id));
+            tasks.Add(_kseScheduleClient.GetIcalContentByRoomAsync(room.Id));
         }
 
         await Task.WhenAll(tasks);

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using RoomLocator.Business.Schedules;
-using RoomLocator.Schedules.Requests;
 
 namespace RoomLocator.Schedules;
 

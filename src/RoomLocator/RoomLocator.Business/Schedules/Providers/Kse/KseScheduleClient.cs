@@ -19,7 +19,7 @@ public class KseScheduleClient : IKseScheduleClient
         return response.Result;
     }
 
-    public async Task<string> GetRoomIcalContentAsync(int id)
+    public async Task<string> GetIcalContentByRoomAsync(int id)
     {
         var response = await _httpClient.GetAsync($"{_baseUrl}/ical?id_grp=0&id_aud={id}");
 
