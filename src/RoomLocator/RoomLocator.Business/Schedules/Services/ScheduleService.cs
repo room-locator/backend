@@ -17,7 +17,8 @@ public class ScheduleService
             "1.17 ASTEM FOUNDATION Classroom",
             new() { "1.17.1 ASTEM FOUNDATION Classroom", "1.17.2 ASTEM FOUNDATION Classroom" }
         },
-        { "2.08 TA Ventures Classroom", new() { "2.08.1 TA Ventures Classroom", "2.08.2 TA Ventures Classroom" } }
+        { "2.08 TA Ventures Classroom", new() { "2.08.1 TA Ventures Classroom", "2.08.2 TA Ventures Classroom" } },
+        { "2.15 Roy Gartner Memorial classroom", new() { "2.15.1 Roy Gartner Memorial classroom", "2.15.2 Roy Gartner Memorial classroom" } }
     };
 
     public ScheduleService(IIcalService icalService, KseScheduleProvider kseScheduleProvider)
