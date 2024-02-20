@@ -1,6 +1,6 @@
 using Ical.Net;
 
-namespace RoomLocator.Business.Schedules;
+namespace RoomLocator.Business.Schedules.Services;
 
 public class IcalService
 {

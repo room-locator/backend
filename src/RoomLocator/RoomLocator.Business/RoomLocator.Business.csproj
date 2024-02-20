@@ -10,8 +10,4 @@
       <PackageReference Include="Ical.Net" Version="4.2.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Cache\" />
-    </ItemGroup>
-
 </Project>

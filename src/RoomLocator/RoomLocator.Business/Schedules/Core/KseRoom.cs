@@ -1,4 +1,4 @@
-namespace RoomLocator.Business.Schedules.Providers.Kse;
+namespace RoomLocator.Business.Schedules.Core;
 
 public class KseRoom
 {

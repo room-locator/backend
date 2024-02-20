@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
+using RoomLocator.Business.Schedules.Core;
+using RoomLocator.Business.Schedules.Interfaces;
 
-namespace RoomLocator.Business.Schedules.Providers.Kse;
+namespace RoomLocator.Business.Schedules.Services;
 
 public class KseScheduleClient : IKseScheduleClient
 {

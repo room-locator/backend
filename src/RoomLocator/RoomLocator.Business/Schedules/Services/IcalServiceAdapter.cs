@@ -1,6 +1,7 @@
+using RoomLocator.Business.Schedules.Core;
 using RoomLocator.Business.Schedules.Interfaces;
 
-namespace RoomLocator.Business.Schedules;
+namespace RoomLocator.Business.Schedules.Services;
 
 public class IcalServiceAdapter : IIcalService
 {

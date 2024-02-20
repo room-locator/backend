@@ -1,6 +1,5 @@
-using RoomLocator.Business.Schedules;
 using RoomLocator.Business.Schedules.Interfaces;
-using RoomLocator.Business.Schedules.Providers.Kse;
+using RoomLocator.Business.Schedules.Services;
 
 namespace RoomLocator.Common.Extensions;
 

@@ -1,4 +1,6 @@
-namespace RoomLocator.Business.Schedules.Providers.Kse;
+using RoomLocator.Business.Schedules.Core;
+
+namespace RoomLocator.Business.Schedules.Interfaces;
 
 public interface IKseScheduleClient
 {

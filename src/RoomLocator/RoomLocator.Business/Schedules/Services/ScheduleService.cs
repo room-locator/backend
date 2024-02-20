@@ -1,7 +1,7 @@
+using RoomLocator.Business.Schedules.Core;
 using RoomLocator.Business.Schedules.Interfaces;
-using RoomLocator.Business.Schedules.Providers.Kse;
 
-namespace RoomLocator.Business.Schedules;
+namespace RoomLocator.Business.Schedules.Services;
 
 public class ScheduleService
 {
@@ -43,9 +43,9 @@ public class ScheduleService
             throw new Exception("desiredTime can not be less or equal to current date");
         }
 
-        desiredTime ??= DateTime.Now;
+        desiredTime ??= TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Europe/Kiev");
 
-        var dictionary = await _kseScheduleProvider.GetIcalContentsByRooms();
+        var dictionary = await _kseScheduleProvider.GetIcalContentsByRoomsAsync();
 
         var richRooms = new List<RichRoom>();
 

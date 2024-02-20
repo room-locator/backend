@@ -1,4 +1,6 @@
-namespace RoomLocator.Business.Schedules.Providers.Kse;
+using RoomLocator.Business.Schedules.Interfaces;
+
+namespace RoomLocator.Business.Schedules.Services;
 
 public class KseScheduleProvider
 {
@@ -9,7 +11,7 @@ public class KseScheduleProvider
         _kseScheduleClient = kseScheduleClient;
     }
 
-    public async Task<Dictionary<string, string>> GetIcalContentsByRooms()
+    public async Task<Dictionary<string, string>> GetIcalContentsByRoomsAsync()
     {
         var rooms = await _kseScheduleClient.GetRoomsAsync();
 

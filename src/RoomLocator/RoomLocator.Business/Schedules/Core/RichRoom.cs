@@ -1,4 +1,4 @@
-namespace RoomLocator.Business.Schedules;
+namespace RoomLocator.Business.Schedules.Core;
 
 public class RichRoom : Room
 {
