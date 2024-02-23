@@ -1,13 +1,18 @@
 using RoomLocator.Business.Schedules.Interfaces;
+using RoomLocator.Persistence.Cache;
 
 namespace RoomLocator.Business.Schedules.Services;
 
 public class KseScheduleProvider
 {
+    private const string CachedRoomsKey = "rooms";
+
+    private readonly ICacheService _cacheService;
     private readonly IKseScheduleClient _kseScheduleClient;
 
-    public KseScheduleProvider(IKseScheduleClient kseScheduleClient)
+    public KseScheduleProvider(ICacheService cacheService, IKseScheduleClient kseScheduleClient)
     {
+        _cacheService = cacheService;
         _kseScheduleClient = kseScheduleClient;
     }
 
@@ -15,20 +20,27 @@ public class KseScheduleProvider
     {
         var rooms = await _kseScheduleClient.GetRoomsAsync();
 
-        var tasks = new List<Task<string>>();
+        var serialized = await _cacheService.GetAsync<List<string>>(CachedRoomsKey);
 
-        foreach (var room in rooms)
+        if (serialized == null)
         {
-            tasks.Add(_kseScheduleClient.GetIcalContentByRoomAsync(room.Id));
-        }
+            var tasks = new List<Task<string>>();
 
-        await Task.WhenAll(tasks);
+            foreach (var room in rooms)
+            {
+                tasks.Add(_kseScheduleClient.GetIcalContentByRoomAsync(room.Id));
+            }
+
+            serialized = (await Task.WhenAll(tasks)).ToList();
+
+            await _cacheService.SetAsync(CachedRoomsKey, serialized, TimeSpan.FromMinutes(10));
+        }
 
         var dictionary = new Dictionary<string, string>();
 
         for (int i = 0; i < rooms.Count; i++)
         {
-            dictionary.Add(rooms[i].Label, tasks[i].Result);
+            dictionary.Add(rooms[i].Label, serialized[i]);
         }
 
         return dictionary;

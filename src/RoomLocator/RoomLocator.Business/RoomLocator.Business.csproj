@@ -10,4 +10,8 @@
       <PackageReference Include="Ical.Net" Version="4.2.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\RoomLocator.Persistence\RoomLocator.Persistence.csproj" />
+    </ItemGroup>
+
 </Project>
