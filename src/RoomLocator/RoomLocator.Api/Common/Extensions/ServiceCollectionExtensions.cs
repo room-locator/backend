@@ -26,9 +26,9 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<HttpClient>();
         services.AddScoped<IcalService>();
-        services.AddScoped<ScheduleService>();
+        services.AddScoped<RoomLocatorService>();
         services.AddScoped<KseScheduleProvider>();
-        services.AddScoped<HierarchalRoomsService>();
+        services.AddScoped<HierarchicalRoomsService>();
         services.AddScoped<IIcalService, IcalServiceAdapter>();
         services.AddScoped<IKseScheduleClient, KseScheduleClient>();
 

@@ -8,17 +8,17 @@ namespace RoomLocator.Schedules;
 [Route("api/schedule")]
 public sealed class ScheduleController
 {
-    private readonly ScheduleService _scheduleService;
+    private readonly RoomLocatorService _roomLocatorService;
 
-    public ScheduleController(ScheduleService scheduleService)
+    public ScheduleController(RoomLocatorService roomLocatorService)
     {
-        _scheduleService = scheduleService;
+        _roomLocatorService = roomLocatorService;
     }
 
     [HttpGet]
-    [Route("available-rooms")]
-    public async Task<List<CalculatedRoom>> FindAvailableRooms([FromQuery] DateTime? desiredTime = null)
+    [Route("rooms/available")]
+    public async Task<List<CalculatedRoom>> LocateAvailableRooms([FromQuery] DateTime? desiredTime = null)
     {
-        return await _scheduleService.FindAvailableRoomsAsync(desiredTime);
+        return await _roomLocatorService.LocateAsync(desiredTime);
     }
 }

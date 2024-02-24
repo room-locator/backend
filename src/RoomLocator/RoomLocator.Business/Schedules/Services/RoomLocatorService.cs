@@ -4,28 +4,29 @@ using RoomLocator.Business.Schedules.Interfaces;
 
 namespace RoomLocator.Business.Schedules.Services;
 
-public class ScheduleService
+public class RoomLocatorService
 {
     private readonly IIcalService _icalService;
     private readonly ICacheService _cacheService;
     private readonly KseScheduleProvider _kseScheduleProvider;
-    private readonly HierarchalRoomsService _hierarchalRoomsService;
+    private readonly HierarchicalRoomsService _hierarchicalRoomsService;
 
     private const string DeserializedCacheKey = "rooms:deserialized";
+    private readonly TimeSpan DeserializedCacheTtl = TimeSpan.FromMinutes(5);
 
-    public ScheduleService(
+    public RoomLocatorService(
         IIcalService icalService,
         ICacheService cacheService,
         KseScheduleProvider kseScheduleProvider,
-        HierarchalRoomsService hierarchalRoomsService)
+        HierarchicalRoomsService hierarchicalRoomsService)
     {
         _icalService = icalService;
         _cacheService = cacheService;
         _kseScheduleProvider = kseScheduleProvider;
-        _hierarchalRoomsService = hierarchalRoomsService;
+        _hierarchicalRoomsService = hierarchicalRoomsService;
     }
 
-    public async Task<List<CalculatedRoom>> FindAvailableRoomsAsync(DateTime? desiredTime = null)
+    public async Task<List<CalculatedRoom>> LocateAsync(DateTime? desiredTime = null)
     {
         if (desiredTime.HasValue && desiredTime.Value < DateTime.Now)
         {
@@ -49,9 +50,9 @@ public class ScheduleService
                 TimeRanges = entry.Value,
             };
 
-            schedule.TimeRanges.AddRange(
-                _hierarchalRoomsService.GetTimeRanges(schedule.Room.Name, deserialized)
-            );
+            var hierarchicalTimeRanges = _hierarchicalRoomsService.GetTimeRanges(schedule.Room.Name, deserialized);
+
+            schedule.TimeRanges.AddRange(hierarchicalTimeRanges);
 
             if (!Available(desiredTime.Value, schedule))
             {
@@ -60,18 +61,18 @@ public class ScheduleService
 
             var nearestFutureRange = CalculateNearestFutureRange(desiredTime.Value, schedule);
 
-            calculatedRooms.Add(new CalculatedRoom
-                {
-                    Name = entry.Key,
-                    NearestTimeRange = nearestFutureRange,
-                }
-            );
+            var calculatedRoom = new CalculatedRoom
+            {
+                Name = entry.Key,
+                NearestTimeRange = nearestFutureRange,
+            };
+
+            calculatedRooms.Add(calculatedRoom);
         }
 
         return calculatedRooms;
     }
 
-    // TODO: think of a proper way to cache the data
     private async Task<Dictionary<string, List<TimeRange>>> GetAndDeserializeAsync()
     {
         var deserialized = await _cacheService.GetAsync<Dictionary<string, List<TimeRange>>>(DeserializedCacheKey);
@@ -90,7 +91,7 @@ public class ScheduleService
             deserialized[entry.Key] = _icalService.Deserialize(entry.Value);
         }
 
-        await _cacheService.SetAsync(DeserializedCacheKey, deserialized, TimeSpan.FromMinutes(4));
+        await _cacheService.SetAsync(DeserializedCacheKey, deserialized, DeserializedCacheTtl);
 
         return deserialized;
     }

@@ -2,7 +2,7 @@ using RoomLocator.Business.Schedules.Core;
 
 namespace RoomLocator.Business.Schedules.Services;
 
-public class HierarchalRoomsService
+public class HierarchicalRoomsService
 {
     private readonly Dictionary<string, string> _children = new();
 
@@ -20,7 +20,7 @@ public class HierarchalRoomsService
         }
     };
 
-    public HierarchalRoomsService()
+    public HierarchicalRoomsService()
     {
         foreach (var entry in _parents)
         {
