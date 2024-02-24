@@ -1,3 +1,4 @@
+using RoomLocator.Persistence.Cache;
 using RoomLocator.Business.Schedules.Core;
 using RoomLocator.Business.Schedules.Interfaces;
 
@@ -6,38 +7,25 @@ namespace RoomLocator.Business.Schedules.Services;
 public class ScheduleService
 {
     private readonly IIcalService _icalService;
+    private readonly ICacheService _cacheService;
     private readonly KseScheduleProvider _kseScheduleProvider;
+    private readonly HierarchalRoomsService _hierarchalRoomsService;
 
-    private readonly Dictionary<string, string> _children = new();
+    private const string DeserializedCacheKey = "rooms:deserialized";
 
-    private readonly Dictionary<string, HashSet<string>> _parents = new()
-    {
-        { "1.08 Genesis Classroom", new() { "1.08.1 Genesis Classroom", "1.08.2 Genesis Classroom" } },
-        {
-            "1.17 ASTEM FOUNDATION Classroom",
-            new() { "1.17.1 ASTEM FOUNDATION Classroom", "1.17.2 ASTEM FOUNDATION Classroom" }
-        },
-        { "2.08 TA Ventures Classroom", new() { "2.08.1 TA Ventures Classroom", "2.08.2 TA Ventures Classroom" } },
-        { "2.15 Roy Gartner Memorial classroom", new() { "2.15.1 Roy Gartner Memorial classroom", "2.15.2 Roy Gartner Memorial classroom" } }
-    };
-
-    public ScheduleService(IIcalService icalService, KseScheduleProvider kseScheduleProvider)
+    public ScheduleService(
+        IIcalService icalService,
+        ICacheService cacheService,
+        KseScheduleProvider kseScheduleProvider,
+        HierarchalRoomsService hierarchalRoomsService)
     {
         _icalService = icalService;
+        _cacheService = cacheService;
         _kseScheduleProvider = kseScheduleProvider;
-
-        foreach (var entry in _parents)
-        {
-            var children = entry.Value;
-
-            foreach (var child in children)
-            {
-                _children[child] = entry.Key;
-            }
-        }
+        _hierarchalRoomsService = hierarchalRoomsService;
     }
 
-    public async Task<List<RichRoom>> FindAvailableRoomsAsync(DateTime? desiredTime = null)
+    public async Task<List<CalculatedRoom>> FindAvailableRoomsAsync(DateTime? desiredTime = null)
     {
         if (desiredTime.HasValue && desiredTime.Value < DateTime.Now)
         {
@@ -46,64 +34,24 @@ public class ScheduleService
 
         desiredTime ??= TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Europe/Kiev");
 
-        var dictionary = await _kseScheduleProvider.GetIcalContentsByRoomsAsync();
+        var deserialized = await GetAndDeserializeAsync();
 
-        var richRooms = new List<RichRoom>();
+        var calculatedRooms = new List<CalculatedRoom>();
 
-        var parentTimeRanges = new Dictionary<string, List<TimeRange>>();
-        var childrenTimeRanges = new Dictionary<string, List<TimeRange>>();
-
-        foreach (var parent in _parents)
+        foreach (var entry in deserialized)
         {
-            if (!dictionary.TryGetValue(parent.Key, out var ical))
-            {
-                continue;
-            }
-
-            var timeRanges = _icalService.Deserialize(ical);
-
-            parentTimeRanges.Add(parent.Key, timeRanges);
-        }
-
-        foreach (var child in _children)
-        {
-            if (!dictionary.TryGetValue(child.Key, out var ical))
-            {
-                continue;
-            }
-
-            var timeRanges = _icalService.Deserialize(ical);
-
-            childrenTimeRanges.Add(child.Key, timeRanges);
-        }
-
-        foreach (var entry in dictionary)
-        {
-            var timeRanges = _icalService.Deserialize(entry.Value);
-
-            var room = new Room
-            {
-                Name = entry.Key,
-            };
-
             var schedule = new Schedule
             {
-                Room = room,
-                TimeRanges = timeRanges,
+                Room = new Room
+                {
+                    Name = entry.Key,
+                },
+                TimeRanges = entry.Value,
             };
 
-            if (_parents.TryGetValue(room.Name, out var children))
-            {
-                foreach (var child in children)
-                {
-                    schedule.TimeRanges.AddRange(childrenTimeRanges[child]);
-                }
-            }
-
-            if (_children.TryGetValue(room.Name, out var parent))
-            {
-                schedule.TimeRanges.AddRange(parentTimeRanges[parent]);
-            }
+            schedule.TimeRanges.AddRange(
+                _hierarchalRoomsService.GetTimeRanges(schedule.Room.Name, deserialized)
+            );
 
             if (!Available(desiredTime.Value, schedule))
             {
@@ -112,7 +60,7 @@ public class ScheduleService
 
             var nearestFutureRange = CalculateNearestFutureRange(desiredTime.Value, schedule);
 
-            richRooms.Add(new RichRoom
+            calculatedRooms.Add(new CalculatedRoom
                 {
                     Name = entry.Key,
                     NearestTimeRange = nearestFutureRange,
@@ -120,7 +68,31 @@ public class ScheduleService
             );
         }
 
-        return richRooms;
+        return calculatedRooms;
+    }
+
+    // TODO: think of a proper way to cache the data
+    private async Task<Dictionary<string, List<TimeRange>>> GetAndDeserializeAsync()
+    {
+        var deserialized = await _cacheService.GetAsync<Dictionary<string, List<TimeRange>>>(DeserializedCacheKey);
+
+        if (deserialized != null)
+        {
+            return deserialized;
+        }
+
+        var serialized = await _kseScheduleProvider.GetSerializedByRoomsAsync();
+
+        deserialized = new Dictionary<string, List<TimeRange>>();
+
+        foreach (var entry in serialized)
+        {
+            deserialized[entry.Key] = _icalService.Deserialize(entry.Value);
+        }
+
+        await _cacheService.SetAsync(DeserializedCacheKey, deserialized, TimeSpan.FromMinutes(4));
+
+        return deserialized;
     }
 
     private bool Available(DateTime desiredTime, Schedule schedule)
