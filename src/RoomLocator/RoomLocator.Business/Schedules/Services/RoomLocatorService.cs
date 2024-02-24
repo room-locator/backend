@@ -28,16 +28,11 @@ public class RoomLocatorService
 
     public async Task<List<CalculatedRoom>> LocateAsync(DateTime? desiredTime = null)
     {
-        if (desiredTime.HasValue && desiredTime.Value < DateTime.Now)
-        {
-            throw new Exception("desiredTime can not be less or equal to current date");
-        }
-
-        desiredTime ??= TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Europe/Kiev");
-
-        var deserialized = await GetAndDeserializeAsync();
+        desiredTime = ValidateOrCoalesce(desiredTime);
 
         var calculatedRooms = new List<CalculatedRoom>();
+
+        var deserialized = await GetAndDeserializeAsync();
 
         foreach (var entry in deserialized)
         {
@@ -50,9 +45,9 @@ public class RoomLocatorService
                 TimeRanges = entry.Value,
             };
 
-            var hierarchicalTimeRanges = _hierarchicalRoomsService.GetTimeRanges(schedule.Room.Name, deserialized);
-
-            schedule.TimeRanges.AddRange(hierarchicalTimeRanges);
+            schedule.TimeRanges.AddRange(
+                _hierarchicalRoomsService.GetTimeRanges(schedule.Room.Name, deserialized)
+            );
 
             if (!Available(desiredTime.Value, schedule))
             {
@@ -61,16 +56,26 @@ public class RoomLocatorService
 
             var nearestFutureRange = CalculateNearestFutureRange(desiredTime.Value, schedule);
 
-            var calculatedRoom = new CalculatedRoom
+            calculatedRooms.Add(new CalculatedRoom
             {
                 Name = entry.Key,
                 NearestTimeRange = nearestFutureRange,
-            };
-
-            calculatedRooms.Add(calculatedRoom);
+            });
         }
 
         return calculatedRooms;
+    }
+
+    private DateTime ValidateOrCoalesce(DateTime? desiredTime)
+    {
+         if (desiredTime.HasValue && desiredTime.Value < DateTime.Now)
+         {
+             throw new Exception("desiredTime can not be less or equal to current date");
+         }
+ 
+         desiredTime ??= TimeZoneInfo.ConvertTimeBySystemTimeZoneId(DateTime.Now, "Europe/Kiev");       
+         
+         return desiredTime.Value;
     }
 
     private async Task<Dictionary<string, List<TimeRange>>> GetAndDeserializeAsync()
